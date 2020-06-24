@@ -26,7 +26,6 @@ client.on("message", (msg) => {
       parseString(body, function (err, result) {
         if (result.root && result.root.row && result.root.row.length > 0) {
           result.root.row.forEach(function (row) {
-            console.log(JSON.stringify(row));
             responseMessage += `${row.$.name}: ${row.$.url}\n`;
           });
           msg.channel.send(
@@ -57,11 +56,17 @@ client.on("message", (msg) => {
       parseString(body, function (err, result) {
         if (result.root && result.root.row && result.root.row.length > 0) {
           responseMessage += `${result.root.row[0].$.name}: ${result.root.row[0].$.url}\n`;
-          if (result.root.row.length == 1) {
+          if (result.root.row.length === 1) {
             msg.channel.send(
               `${prefix}Znaleziono 1 odpowiedź na zapytanie o "${msg.content.slice(
                 8
               )}":\n${responseMessage}`
+            );
+          } else if (result.root.row.length === 10) {
+            msg.channel.send(
+              `${prefix}Znaleziono co najmniej 10 odpowiedzi na zapytanie o "${msg.content.slice(
+                8
+              )}", aby wyświetlić 10 pierwszych rezultatów użyj polecenia \`/golbotall\`:\n${responseMessage}`
             );
           } else {
             msg.channel.send(
