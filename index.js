@@ -57,13 +57,21 @@ client.on("message", (msg) => {
       parseString(body, function (err, result) {
         if (result.root && result.root.row && result.root.row.length > 0) {
           responseMessage += `${result.root.row[0].$.name}: ${result.root.row[0].$.url}\n`;
-          msg.channel.send(
-            `${prefix}Znaleziono ${
-              result.root.row.length
-            } odpowiedzi na zapytanie o "${msg.content.slice(
-              8
-            )}", aby wyświetlić wszystkie rezultaty użyj polecenia \`/golbotall\`:\n${responseMessage}`
-          );
+          if (result.root.row.length == 1) {
+            msg.channel.send(
+              `${prefix}Znaleziono 1 odpowiedź na zapytanie o "${msg.content.slice(
+                8
+              )}":\n${responseMessage}`
+            );
+          } else {
+            msg.channel.send(
+              `${prefix}Znaleziono ${
+                result.root.row.length
+              } odpowiedzi na zapytanie o "${msg.content.slice(
+                8
+              )}", aby wyświetlić wszystkie rezultaty użyj polecenia \`/golbotall\`:\n${responseMessage}`
+            );
+          }
         } else {
           msg.channel.send(
             `${prefix}Nie znaleziono odpowiedzi na zapytanie o "${msg.content.slice(
