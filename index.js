@@ -46,45 +46,49 @@ client.on("message", (msg) => {
     })();
   } else if (msg.content.match(/^\/golbot*\w+/)) {
     (async () => {
-      const response = await fetch(
-        `https://www.gry-online.pl/ajax/xml/gry.asp?search=${escape(
-          msg.content.slice(8)
-        )}`
-      );
-      const body = await response.text();
-      let responseMessage = "";
-      parseString(body, function (err, result) {
-        if (result.root && result.root.row && result.root.row.length > 0) {
-          responseMessage += `${result.root.row[0].$.name}: ${result.root.row[0].$.url}\n`;
-          if (result.root.row.length === 1) {
-            msg.channel.send(
-              `${prefix}Znaleziono 1 odpowiedź na zapytanie o "${msg.content.slice(
-                8
-              )}":\n${responseMessage}`
-            );
-          } else if (result.root.row.length === 10) {
-            msg.channel.send(
-              `${prefix}Znaleziono co najmniej 10 odpowiedzi na zapytanie o "${msg.content.slice(
-                8
-              )}", aby wyświetlić 10 pierwszych rezultatów użyj polecenia \`/golbotall\`:\n${responseMessage}`
-            );
+      try {
+        const response = await fetch(
+          `https://www.gry-online.pl/ajax/xml/gry.asp?search=${escape(
+            msg.content.slice(8)
+          )}`
+        );
+        const body = await response.text();
+        let responseMessage = "";
+        parseString(body, function (err, result) {
+          if (result.root && result.root.row && result.root.row.length > 0) {
+            responseMessage += `${result.root.row[0].$.name}: ${result.root.row[0].$.url}\n`;
+            if (result.root.row.length === 1) {
+              msg.channel.send(
+                `${prefix}Znaleziono 1 odpowiedź na zapytanie o "${msg.content.slice(
+                  8
+                )}":\n${responseMessage}`
+              );
+            } else if (result.root.row.length === 10) {
+              msg.channel.send(
+                `${prefix}Znaleziono co najmniej 10 odpowiedzi na zapytanie o "${msg.content.slice(
+                  8
+                )}", aby wyświetlić 10 pierwszych rezultatów użyj polecenia \`/golbotall\`:\n${responseMessage}`
+              );
+            } else {
+              msg.channel.send(
+                `${prefix}Znaleziono ${
+                  result.root.row.length
+                } odpowiedzi na zapytanie o "${msg.content.slice(
+                  8
+                )}", aby wyświetlić wszystkie rezultaty użyj polecenia \`/golbotall\`:\n${responseMessage}`
+              );
+            }
           } else {
             msg.channel.send(
-              `${prefix}Znaleziono ${
-                result.root.row.length
-              } odpowiedzi na zapytanie o "${msg.content.slice(
+              `${prefix}Nie znaleziono odpowiedzi na zapytanie o "${msg.content.slice(
                 8
-              )}", aby wyświetlić wszystkie rezultaty użyj polecenia \`/golbotall\`:\n${responseMessage}`
+              )}".`
             );
           }
-        } else {
-          msg.channel.send(
-            `${prefix}Nie znaleziono odpowiedzi na zapytanie o "${msg.content.slice(
-              8
-            )}".`
-          );
-        }
-      });
+        });
+      } catch (err) {
+        console.log(err); // TypeError: failed to fetch
+      }
     })();
   }
 });
