@@ -2,11 +2,17 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const fetch = require("node-fetch");
 const env = require("./env");
-var parseString = require("xml2js").parseString;
+const parseString = require("xml2js").parseString;
+
+let prefix = "";
+if (env.environment === "dev") {
+  prefix = "DEV: ";
+}
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
+
 client.on("message", (msg) => {
   if (msg.content.match(/^\/golbotall*\w+/)) {
     (async () => {
@@ -24,7 +30,7 @@ client.on("message", (msg) => {
             responseMessage += `${row.$.name}: ${row.$.url}\n`;
           });
           msg.channel.send(
-            `Znaleziono ${
+            `${prefix}Znaleziono ${
               result.root.row.length
             } odpowiedzi na zapytanie o "${msg.content.slice(
               11
@@ -32,7 +38,7 @@ client.on("message", (msg) => {
           );
         } else {
           msg.channel.send(
-            `Nie znaleziono odpowiedzi na zapytanie o "${msg.content.slice(
+            `${prefix}Nie znaleziono odpowiedzi na zapytanie o "${msg.content.slice(
               11
             )}".`
           );
@@ -52,7 +58,7 @@ client.on("message", (msg) => {
         if (result.root && result.root.row && result.root.row.length > 0) {
           responseMessage += `${result.root.row[0].$.name}: ${result.root.row[0].$.url}\n`;
           msg.channel.send(
-            `Znaleziono ${
+            `${prefix}Znaleziono ${
               result.root.row.length
             } odpowiedzi na zapytanie o "${msg.content.slice(
               8
@@ -60,7 +66,7 @@ client.on("message", (msg) => {
           );
         } else {
           msg.channel.send(
-            `Nie znaleziono odpowiedzi na zapytanie o "${msg.content.slice(
+            `${prefix}Nie znaleziono odpowiedzi na zapytanie o "${msg.content.slice(
               8
             )}".`
           );
