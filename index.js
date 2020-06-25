@@ -14,37 +14,44 @@ client.on("ready", () => {
 });
 
 client.on("message", (msg) => {
-  if (msg.content.match(/^\/golbotall*\w+/)) {
+  if (msg.content.match(/^(\/|\!)golbotall*\w+/)) {
     (async () => {
-      const response = await fetch(
-        `https://www.gry-online.pl/ajax/xml/gry.asp?search=${escape(
-          msg.content.slice(11)
-        )}`
-      );
-      const body = await response.text();
-      let responseMessage = "";
-      parseString(body, function (err, result) {
-        if (result.root && result.root.row && result.root.row.length > 0) {
-          result.root.row.forEach(function (row) {
-            responseMessage += `${row.$.name}: ${row.$.url}\n`;
-          });
-          msg.channel.send(
-            `${prefix}Znaleziono ${
-              result.root.row.length
-            } odpowiedzi na zapytanie o "${msg.content.slice(
-              11
-            )}":\n${responseMessage}`
-          );
-        } else {
-          msg.channel.send(
-            `${prefix}Nie znaleziono odpowiedzi na zapytanie o "${msg.content.slice(
-              11
-            )}".`
-          );
-        }
-      });
+      try {
+        const response = await fetch(
+          `https://www.gry-online.pl/ajax/xml/gry.asp?search=${escape(
+            msg.content.slice(11)
+          )}`
+        );
+        const body = await response.text();
+        let responseMessage = "";
+        parseString(body, function (err, result) {
+          if (result.root && result.root.row && result.root.row.length > 0) {
+            result.root.row.forEach(function (row) {
+              responseMessage += `${row.$.name}: ${row.$.url}\n`;
+            });
+            msg.channel.send(
+              `${prefix}Znaleziono ${
+                result.root.row.length
+              } odpowiedzi na zapytanie o "${msg.content.slice(
+                11
+              )}":\n${responseMessage}`
+            );
+          } else {
+            msg.channel.send(
+              `${prefix}Nie znaleziono odpowiedzi na zapytanie o "${msg.content.slice(
+                11
+              )}".`
+            );
+          }
+        });
+      } catch (err) {
+        msg.channel.send(
+          `${prefix}Wystąpił błąd podczas przetwarzania zapytania.`
+        );
+        console.log(err); // TypeError: failed to fetch
+      }
     })();
-  } else if (msg.content.match(/^\/golbot*\w+/)) {
+  } else if (msg.content.match(/^(\/|\!)golbot*\w+/)) {
     (async () => {
       try {
         const response = await fetch(
@@ -87,6 +94,9 @@ client.on("message", (msg) => {
           }
         });
       } catch (err) {
+        msg.channel.send(
+          `${prefix}Wystąpił błąd podczas przetwarzania zapytania.`
+        );
         console.log(err); // TypeError: failed to fetch
       }
     })();
